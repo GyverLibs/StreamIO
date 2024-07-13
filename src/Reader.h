@@ -6,27 +6,28 @@ class Reader {
     Reader(Stream& stream, size_t len) : _stream(&stream), _len(len) {}
     Reader(const uint8_t* bytes, size_t len, bool pgm = false) : _bytes(bytes), _len(len), _pgm(pgm) {}
 
-    uint8_t read() {
-        if (!_len) return 0;
+    int read() {
+        if (!_len) return -1;
         _len--;
+        
         if (_stream) {
-            if (!_waitStream()) return 0;
-            return _prev = _stream->read();
+            if (!_waitStream()) return -1;
+            _prev = _stream->read();
         } else if (_bytes) {
-            return _prev = (_pgm ? pgm_read_byte(_bytes++) : *(_bytes++));
+            _prev = _pgm ? pgm_read_byte(_bytes) : *_bytes;
+            _bytes++;
         }
-        return 0;
+        return _prev;
     }
 
     bool read(void* dest, size_t size) {
         if (size > _len) return 0;
+        _len -= size;
 
         if (_stream) {
-            _len -= size;
             return (_stream->readBytes((uint8_t*)dest, size) == size);
         } else if (_bytes) {
             _pgm ? memcpy_P(dest, _bytes, size) : memcpy(dest, _bytes, size);
-            _len -= size;
             _bytes += size;
             return 1;
         }
