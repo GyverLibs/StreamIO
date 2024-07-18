@@ -9,7 +9,7 @@ class Reader {
     int read() {
         if (!_len) return -1;
         _len--;
-        
+
         if (_stream) {
             if (!_waitStream()) return -1;
             _prev = _stream->read();
@@ -45,6 +45,10 @@ class Reader {
 
     inline size_t available() {
         return _len;
+    }
+
+    void setLength(size_t len) {
+        _len = len;
     }
 
    private:
