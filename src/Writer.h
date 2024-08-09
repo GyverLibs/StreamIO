@@ -21,7 +21,7 @@ class Writer {
     }
 
     template <typename T>
-    bool write(T& val) {
+    bool write(const T& val) {
         return write(&val, sizeof(T));
     }
 
